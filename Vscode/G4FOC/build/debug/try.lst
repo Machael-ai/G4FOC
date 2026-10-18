@@ -1,0 +1,170 @@
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccLstYeh.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"try.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Send_Simple_CAN_Frame,"ax",%progbits
+  20              		.align	1
+  21              		.global	Send_Simple_CAN_Frame
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	Send_Simple_CAN_Frame:
+  27              	.LFB329:
+  28              		.file 1 "Cybergear/try.c"
+   1:Cybergear/try.c **** #include "main.h"
+   2:Cybergear/try.c **** #include "fdcan.h"  // 确保包含FDCAN头文件
+   3:Cybergear/try.c **** #include "cybergear.h"
+   4:Cybergear/try.c **** 
+   5:Cybergear/try.c **** #define CAN_EXTENDED_ID  0x1234567  // 29位扩展ID
+   6:Cybergear/try.c **** uint8_t can_data[8] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}; // 8字节数据
+   7:Cybergear/try.c **** 
+   8:Cybergear/try.c **** void Send_Simple_CAN_Frame(void)
+   9:Cybergear/try.c **** {
+  29              		.loc 1 9 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 40
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 00B5     		push	{lr}
+  34              		.cfi_def_cfa_offset 4
+  35              		.cfi_offset 14, -4
+  36 0002 8BB0     		sub	sp, sp, #44
+  37              		.cfi_def_cfa_offset 48
+  10:Cybergear/try.c ****     FDCAN_TxHeaderTypeDef TxHeader;
+  38              		.loc 1 10 5 view .LVU1
+  11:Cybergear/try.c ****     
+  12:Cybergear/try.c ****     // 配置发送帧头（扩展帧）
+  13:Cybergear/try.c ****     TxHeader.Identifier = CAN_EXTENDED_ID;      // 29位ID
+  39              		.loc 1 13 5 view .LVU2
+  40              		.loc 1 13 25 is_stmt 0 view .LVU3
+  41 0004 0C4B     		ldr	r3, .L5
+  42 0006 0193     		str	r3, [sp, #4]
+  14:Cybergear/try.c ****     TxHeader.IdType = FDCAN_EXTENDED_ID;        // 扩展帧
+  43              		.loc 1 14 5 is_stmt 1 view .LVU4
+  44              		.loc 1 14 21 is_stmt 0 view .LVU5
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccLstYeh.s 			page 2
+
+
+  45 0008 4FF08043 		mov	r3, #1073741824
+  46 000c 0293     		str	r3, [sp, #8]
+  15:Cybergear/try.c ****     TxHeader.TxFrameType = FDCAN_DATA_FRAME;    // 数据帧
+  47              		.loc 1 15 5 is_stmt 1 view .LVU6
+  48              		.loc 1 15 26 is_stmt 0 view .LVU7
+  49 000e 0023     		movs	r3, #0
+  50 0010 0393     		str	r3, [sp, #12]
+  16:Cybergear/try.c ****     TxHeader.DataLength = FDCAN_DLC_BYTES_8;    // 数据长度=8字节
+  51              		.loc 1 16 5 is_stmt 1 view .LVU8
+  52              		.loc 1 16 25 is_stmt 0 view .LVU9
+  53 0012 0822     		movs	r2, #8
+  54 0014 0492     		str	r2, [sp, #16]
+  17:Cybergear/try.c ****     TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+  55              		.loc 1 17 5 is_stmt 1 view .LVU10
+  56              		.loc 1 17 34 is_stmt 0 view .LVU11
+  57 0016 0593     		str	r3, [sp, #20]
+  18:Cybergear/try.c ****     TxHeader.BitRateSwitch = FDCAN_BRS_OFF;     // 经典CAN模式
+  58              		.loc 1 18 5 is_stmt 1 view .LVU12
+  59              		.loc 1 18 28 is_stmt 0 view .LVU13
+  60 0018 0693     		str	r3, [sp, #24]
+  19:Cybergear/try.c ****     TxHeader.FDFormat = FDCAN_CLASSIC_CAN;      // 经典CAN帧
+  61              		.loc 1 19 5 is_stmt 1 view .LVU14
+  62              		.loc 1 19 23 is_stmt 0 view .LVU15
+  63 001a 0793     		str	r3, [sp, #28]
+  20:Cybergear/try.c ****     TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+  64              		.loc 1 20 5 is_stmt 1 view .LVU16
+  65              		.loc 1 20 33 is_stmt 0 view .LVU17
+  66 001c 0893     		str	r3, [sp, #32]
+  21:Cybergear/try.c ****     TxHeader.MessageMarker = 0;
+  67              		.loc 1 21 5 is_stmt 1 view .LVU18
+  68              		.loc 1 21 28 is_stmt 0 view .LVU19
+  69 001e 0993     		str	r3, [sp, #36]
+  22:Cybergear/try.c ****     
+  23:Cybergear/try.c ****     // 发送数据（使用FIFO队列）
+  24:Cybergear/try.c ****     if(HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, can_data) != HAL_OK)
+  70              		.loc 1 24 5 is_stmt 1 view .LVU20
+  71              		.loc 1 24 8 is_stmt 0 view .LVU21
+  72 0020 064A     		ldr	r2, .L5+4
+  73 0022 01A9     		add	r1, sp, #4
+  74 0024 0648     		ldr	r0, .L5+8
+  75 0026 FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+  76              	.LVL0:
+  77              		.loc 1 24 7 view .LVU22
+  78 002a 10B9     		cbnz	r0, .L4
+  79              	.L1:
+  25:Cybergear/try.c ****     {
+  26:Cybergear/try.c ****         // 发送失败处理（可添加错误处理）
+  27:Cybergear/try.c ****         Error_Handler();
+  28:Cybergear/try.c ****     }
+  29:Cybergear/try.c **** }
+  80              		.loc 1 29 1 view .LVU23
+  81 002c 0BB0     		add	sp, sp, #44
+  82              		.cfi_remember_state
+  83              		.cfi_def_cfa_offset 4
+  84              		@ sp needed
+  85 002e 5DF804FB 		ldr	pc, [sp], #4
+  86              	.L4:
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccLstYeh.s 			page 3
+
+
+  87              		.cfi_restore_state
+  27:Cybergear/try.c ****     }
+  88              		.loc 1 27 9 is_stmt 1 view .LVU24
+  89 0032 FFF7FEFF 		bl	Error_Handler
+  90              	.LVL1:
+  91              		.loc 1 29 1 is_stmt 0 view .LVU25
+  92 0036 F9E7     		b	.L1
+  93              	.L6:
+  94              		.align	2
+  95              	.L5:
+  96 0038 67452301 		.word	19088743
+  97 003c 00000000 		.word	.LANCHOR0
+  98 0040 00000000 		.word	hfdcan1
+  99              		.cfi_endproc
+ 100              	.LFE329:
+ 102              		.global	can_data
+ 103              		.section	.data.can_data,"aw"
+ 104              		.align	2
+ 105              		.set	.LANCHOR0,. + 0
+ 108              	can_data:
+ 109 0000 11223344 		.ascii	"\021\"3DUfw\210"
+ 109      55667788 
+ 110              		.text
+ 111              	.Letext0:
+ 112              		.file 2 "c:\\users\\mk\\gccarm\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_
+ 113              		.file 3 "c:\\users\\mk\\gccarm\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdi
+ 114              		.file 4 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g431xx.h"
+ 115              		.file 5 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g4xx.h"
+ 116              		.file 6 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h"
+ 117              		.file 7 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_fdcan.h"
+ 118              		.file 8 "Core/Inc/fdcan.h"
+ 119              		.file 9 "Core/Inc/main.h"
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccLstYeh.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 try.c
+C:\Users\MK\AppData\Local\Temp\ccLstYeh.s:20     .text.Send_Simple_CAN_Frame:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccLstYeh.s:26     .text.Send_Simple_CAN_Frame:00000000 Send_Simple_CAN_Frame
+C:\Users\MK\AppData\Local\Temp\ccLstYeh.s:96     .text.Send_Simple_CAN_Frame:00000038 $d
+C:\Users\MK\AppData\Local\Temp\ccLstYeh.s:108    .data.can_data:00000000 can_data
+C:\Users\MK\AppData\Local\Temp\ccLstYeh.s:104    .data.can_data:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_FDCAN_AddMessageToTxFifoQ
+Error_Handler
+hfdcan1

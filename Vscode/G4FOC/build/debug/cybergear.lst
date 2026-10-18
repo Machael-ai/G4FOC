@@ -1,0 +1,1430 @@
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"cybergear.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Float_to_Byte,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	Float_to_Byte:
+  26              	.LVL0:
+  27              	.LFB329:
+  28              		.file 1 "Cybergear/cybergear.c"
+   1:Cybergear/cybergear.c **** #include "main.h"
+   2:Cybergear/cybergear.c **** #include "fdcan.h"
+   3:Cybergear/cybergear.c **** #include "cybergear.h"
+   4:Cybergear/cybergear.c **** 
+   5:Cybergear/cybergear.c **** FDCAN_TxHeaderTypeDef txmsg;
+   6:Cybergear/cybergear.c **** FDCAN_RxHeaderTypeDef rxMsg;//·¢ËÍÅäÖÃ½á¹¹Ìå
+   7:Cybergear/cybergear.c **** uint8_t rx_data[8];       //½ÓÊÕÊý¾Ý
+   8:Cybergear/cybergear.c **** uint32_t Motor_Can_ID;    //½ÓÊÕÊý¾Ýµç»úID
+   9:Cybergear/cybergear.c **** uint8_t byte[4];          //×ª»»ÁÙÊ±Êý¾Ý
+  10:Cybergear/cybergear.c **** //#define HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data) HAL_FDCAN_AddMessa
+  11:Cybergear/cybergear.c **** //½«ËùÓÐµÄHAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data)¸Ä³ÉHAL_FDCAN_AddMe
+  12:Cybergear/cybergear.c **** MI_Motor mi_motor[4];//Ô¤ÏÈ¶¨ÒåËÄ¸öÐ¡Ã×µç»ú
+  13:Cybergear/cybergear.c **** 
+  14:Cybergear/cybergear.c **** /**
+  15:Cybergear/cybergear.c ****   * @brief          ¸¡µãÊý×ª4×Ö½Úº¯Êý
+  16:Cybergear/cybergear.c ****   * @param[in]      f:¸¡µãÊý
+  17:Cybergear/cybergear.c ****   * @retval         4×Ö½ÚÊý×é
+  18:Cybergear/cybergear.c ****   * @description  : IEEE 754 Ð­Òé
+  19:Cybergear/cybergear.c ****   */
+  20:Cybergear/cybergear.c **** static uint8_t* Float_to_Byte(float f)
+  21:Cybergear/cybergear.c **** {
+  29              		.loc 1 21 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34              		.loc 1 21 1 is_stmt 0 view .LVU1
+  35 0000 82B0     		sub	sp, sp, #8
+  36              		.cfi_def_cfa_offset 8
+  37 0002 8DED010A 		vstr.32	s0, [sp, #4]
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 2
+
+
+  22:Cybergear/cybergear.c **** 	unsigned long longdata = 0;
+  38              		.loc 1 22 2 is_stmt 1 view .LVU2
+  39              	.LVL1:
+  23:Cybergear/cybergear.c **** 	longdata = *(unsigned long*)&f;       
+  40              		.loc 1 23 2 view .LVU3
+  41              		.loc 1 23 11 is_stmt 0 view .LVU4
+  42 0006 019B     		ldr	r3, [sp, #4]
+  43              	.LVL2:
+  24:Cybergear/cybergear.c **** 	byte[0] = (longdata & 0xFF000000) >> 24;
+  44              		.loc 1 24 2 is_stmt 1 view .LVU5
+  45              		.loc 1 24 36 is_stmt 0 view .LVU6
+  46 0008 1A0E     		lsrs	r2, r3, #24
+  47              		.loc 1 24 10 view .LVU7
+  48 000a 0448     		ldr	r0, .L3
+  49 000c 0270     		strb	r2, [r0]
+  25:Cybergear/cybergear.c **** 	byte[1] = (longdata & 0x00FF0000) >> 16;
+  50              		.loc 1 25 2 is_stmt 1 view .LVU8
+  51              		.loc 1 25 36 is_stmt 0 view .LVU9
+  52 000e 1A0C     		lsrs	r2, r3, #16
+  53              		.loc 1 25 10 view .LVU10
+  54 0010 4270     		strb	r2, [r0, #1]
+  26:Cybergear/cybergear.c **** 	byte[2] = (longdata & 0x0000FF00) >> 8;
+  55              		.loc 1 26 2 is_stmt 1 view .LVU11
+  56              		.loc 1 26 36 is_stmt 0 view .LVU12
+  57 0012 1A0A     		lsrs	r2, r3, #8
+  58              		.loc 1 26 10 view .LVU13
+  59 0014 8270     		strb	r2, [r0, #2]
+  27:Cybergear/cybergear.c **** 	byte[3] = (longdata & 0x000000FF);
+  60              		.loc 1 27 2 is_stmt 1 view .LVU14
+  61              		.loc 1 27 10 is_stmt 0 view .LVU15
+  62 0016 C370     		strb	r3, [r0, #3]
+  28:Cybergear/cybergear.c **** 	return byte;
+  63              		.loc 1 28 2 is_stmt 1 view .LVU16
+  29:Cybergear/cybergear.c **** }
+  64              		.loc 1 29 1 is_stmt 0 view .LVU17
+  65 0018 02B0     		add	sp, sp, #8
+  66              		.cfi_def_cfa_offset 0
+  67              		@ sp needed
+  68 001a 7047     		bx	lr
+  69              	.L4:
+  70              		.align	2
+  71              	.L3:
+  72 001c 00000000 		.word	.LANCHOR0
+  73              		.cfi_endproc
+  74              	.LFE329:
+  76              		.section	.text.float_to_uint,"ax",%progbits
+  77              		.align	1
+  78              		.syntax unified
+  79              		.thumb
+  80              		.thumb_func
+  82              	float_to_uint:
+  83              	.LVL3:
+  84              	.LFB331:
+  30:Cybergear/cybergear.c **** 
+  31:Cybergear/cybergear.c **** /**
+  32:Cybergear/cybergear.c ****   * @brief          Ð¡Ã×µç»ú»ØÎÄ16Î»Êý¾Ý×ª¸¡µã
+  33:Cybergear/cybergear.c ****   * @param[in]      x:16Î»»ØÎÄ
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 3
+
+
+  34:Cybergear/cybergear.c ****   * @param[in]      x_min:¶ÔÓ¦²ÎÊýÏÂÏÞ
+  35:Cybergear/cybergear.c ****   * @param[in]      x_max:¶ÔÓ¦²ÎÊýÉÏÏÞ
+  36:Cybergear/cybergear.c ****   * @param[in]      bits:²ÎÊýÎ»Êý
+  37:Cybergear/cybergear.c ****   * @retval         ·µ»Ø¸¡µãÖµ
+  38:Cybergear/cybergear.c ****   */
+  39:Cybergear/cybergear.c **** static float uint16_to_float(uint16_t x,float x_min,float x_max,int bits)
+  40:Cybergear/cybergear.c **** {
+  41:Cybergear/cybergear.c ****     uint32_t span = (1 << bits) - 1;
+  42:Cybergear/cybergear.c ****     float offset = x_max - x_min;
+  43:Cybergear/cybergear.c ****     return offset * x / span + x_min;
+  44:Cybergear/cybergear.c **** }
+  45:Cybergear/cybergear.c **** 
+  46:Cybergear/cybergear.c **** /**
+  47:Cybergear/cybergear.c ****   * @brief          Ð¡Ã×µç»ú·¢ËÍ¸¡µã×ª16Î»Êý¾Ý
+  48:Cybergear/cybergear.c ****   * @param[in]      x:¸¡µã
+  49:Cybergear/cybergear.c ****   * @param[in]      x_min:¶ÔÓ¦²ÎÊýÏÂÏÞ
+  50:Cybergear/cybergear.c ****   * @param[in]      x_max:¶ÔÓ¦²ÎÊýÉÏÏÞ
+  51:Cybergear/cybergear.c ****   * @param[in]      bits:²ÎÊýÎ»Êý
+  52:Cybergear/cybergear.c ****   * @retval         ·µ»Ø¸¡µãÖµ
+  53:Cybergear/cybergear.c ****   */
+  54:Cybergear/cybergear.c **** static int float_to_uint(float x, float x_min, float x_max, int bits)
+  55:Cybergear/cybergear.c **** {
+  85              		.loc 1 55 1 is_stmt 1 view -0
+  86              		.cfi_startproc
+  87              		@ args = 0, pretend = 0, frame = 0
+  88              		@ frame_needed = 0, uses_anonymous_args = 0
+  89              		@ link register save eliminated.
+  56:Cybergear/cybergear.c ****   float span = x_max - x_min;
+  90              		.loc 1 56 3 view .LVU19
+  91              		.loc 1 56 9 is_stmt 0 view .LVU20
+  92 0000 31EE607A 		vsub.f32	s14, s2, s1
+  93              	.LVL4:
+  57:Cybergear/cybergear.c ****   float offset = x_min;
+  94              		.loc 1 57 3 is_stmt 1 view .LVU21
+  58:Cybergear/cybergear.c ****   if(x > x_max) x=x_max;
+  95              		.loc 1 58 3 view .LVU22
+  96              		.loc 1 58 5 is_stmt 0 view .LVU23
+  97 0004 B4EEC01A 		vcmpe.f32	s2, s0
+  98 0008 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  99 000c 06D4     		bmi	.L6
+  59:Cybergear/cybergear.c ****   else if(x < x_min) x= x_min;
+ 100              		.loc 1 59 8 is_stmt 1 view .LVU24
+ 101              		.loc 1 59 10 is_stmt 0 view .LVU25
+ 102 000e F4EEC00A 		vcmpe.f32	s1, s0
+ 103 0012 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 104 0016 14DC     		bgt	.L7
+ 105 0018 B0EE401A 		vmov.f32	s2, s0
+ 106              	.LVL5:
+ 107              	.L6:
+  60:Cybergear/cybergear.c ****   return (int) ((x-offset)*((float)((1<<bits)-1))/span);
+ 108              		.loc 1 60 3 is_stmt 1 view .LVU26
+ 109              		.loc 1 60 19 is_stmt 0 view .LVU27
+ 110 001c 71EE600A 		vsub.f32	s1, s2, s1
+ 111              	.LVL6:
+ 112              		.loc 1 60 39 view .LVU28
+ 113 0020 0123     		movs	r3, #1
+ 114 0022 03FA00F0 		lsl	r0, r3, r0
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 4
+
+
+ 115              	.LVL7:
+ 116              		.loc 1 60 46 view .LVU29
+ 117 0026 431E     		subs	r3, r0, #1
+ 118 0028 01EE103A 		vmov	s2, r3	@ int
+ 119              	.LVL8:
+ 120              		.loc 1 60 29 view .LVU30
+ 121 002c B8EEC11A 		vcvt.f32.s32	s2, s2
+ 122              		.loc 1 60 27 view .LVU31
+ 123 0030 20EE811A 		vmul.f32	s2, s1, s2
+ 124              		.loc 1 60 50 view .LVU32
+ 125 0034 C1EE077A 		vdiv.f32	s15, s2, s14
+  61:Cybergear/cybergear.c **** }
+ 126              		.loc 1 61 1 view .LVU33
+ 127 0038 FDEEE77A 		vcvt.s32.f32	s15, s15
+ 128 003c 17EE900A 		vmov	r0, s15	@ int
+ 129 0040 7047     		bx	lr
+ 130              	.LVL9:
+ 131              	.L7:
+  59:Cybergear/cybergear.c ****   else if(x < x_min) x= x_min;
+ 132              		.loc 1 59 23 view .LVU34
+ 133 0042 B0EE601A 		vmov.f32	s2, s1
+ 134              	.LVL10:
+  59:Cybergear/cybergear.c ****   else if(x < x_min) x= x_min;
+ 135              		.loc 1 59 23 view .LVU35
+ 136 0046 E9E7     		b	.L6
+ 137              		.cfi_endproc
+ 138              	.LFE331:
+ 140              		.section	.text.Set_Motor_Parameter,"ax",%progbits
+ 141              		.align	1
+ 142              		.syntax unified
+ 143              		.thumb
+ 144              		.thumb_func
+ 146              	Set_Motor_Parameter:
+ 147              	.LVL11:
+ 148              	.LFB332:
+  62:Cybergear/cybergear.c **** 
+  63:Cybergear/cybergear.c **** /**
+  64:Cybergear/cybergear.c ****   * @brief          Ð´Èëµç»ú²ÎÊý
+  65:Cybergear/cybergear.c ****   * @param[in]      Motor:¶ÔÓ¦¿ØÖÆµç»ú½á¹¹Ìå
+  66:Cybergear/cybergear.c ****   * @param[in]      Index:Ð´Èë²ÎÊý¶ÔÓ¦µØÖ·
+  67:Cybergear/cybergear.c ****   * @param[in]      Value:Ð´Èë²ÎÊýÖµ
+  68:Cybergear/cybergear.c ****   * @param[in]      Value_type:Ð´Èë²ÎÊýÊý¾ÝÀàÐÍ
+  69:Cybergear/cybergear.c ****   * @retval         none
+  70:Cybergear/cybergear.c ****   */
+  71:Cybergear/cybergear.c **** static void Set_Motor_Parameter(MI_Motor *Motor,uint16_t Index,float Value,char Value_type){
+ 149              		.loc 1 71 92 is_stmt 1 view -0
+ 150              		.cfi_startproc
+ 151              		@ args = 0, pretend = 0, frame = 8
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153              		.loc 1 71 92 is_stmt 0 view .LVU37
+ 154 0000 00B5     		push	{lr}
+ 155              		.cfi_def_cfa_offset 4
+ 156              		.cfi_offset 14, -4
+ 157 0002 83B0     		sub	sp, sp, #12
+ 158              		.cfi_def_cfa_offset 16
+  72:Cybergear/cybergear.c **** 	uint8_t tx_data[8];
+ 159              		.loc 1 72 2 is_stmt 1 view .LVU38
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 5
+
+
+  73:Cybergear/cybergear.c ****     uint32_t can_id;
+ 160              		.loc 1 73 5 view .LVU39
+  74:Cybergear/cybergear.c **** 	can_id= Communication_Type_SetSingleParameter<<24|Master_CAN_ID<<8|Motor->CAN_ID;
+ 161              		.loc 1 74 2 view .LVU40
+ 162              		.loc 1 74 74 is_stmt 0 view .LVU41
+ 163 0004 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 164              		.loc 1 74 68 view .LVU42
+ 165 0006 43F09053 		orr	r3, r3, #301989888
+ 166 000a 43F47D43 		orr	r3, r3, #64768
+ 167              	.LVL12:
+  75:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.Identifier = can_id;
+ 168              		.loc 1 75 5 is_stmt 1 view .LVU43
+ 169              		.loc 1 75 38 is_stmt 0 view .LVU44
+ 170 000e 1C48     		ldr	r0, .L14
+ 171              	.LVL13:
+ 172              		.loc 1 75 38 view .LVU45
+ 173 0010 4360     		str	r3, [r0, #4]
+  76:Cybergear/cybergear.c **** 	tx_data[0]=Index;
+ 174              		.loc 1 76 2 is_stmt 1 view .LVU46
+ 175              		.loc 1 76 12 is_stmt 0 view .LVU47
+ 176 0012 8DF80010 		strb	r1, [sp]
+  77:Cybergear/cybergear.c **** 	tx_data[1]=Index>>8;
+ 177              		.loc 1 77 2 is_stmt 1 view .LVU48
+ 178              		.loc 1 77 12 is_stmt 0 view .LVU49
+ 179 0016 090A     		lsrs	r1, r1, #8
+ 180              	.LVL14:
+ 181              		.loc 1 77 12 view .LVU50
+ 182 0018 8DF80110 		strb	r1, [sp, #1]
+  78:Cybergear/cybergear.c **** 	tx_data[2]=0x00;
+ 183              		.loc 1 78 2 is_stmt 1 view .LVU51
+ 184              		.loc 1 78 12 is_stmt 0 view .LVU52
+ 185 001c 0023     		movs	r3, #0
+ 186              	.LVL15:
+ 187              		.loc 1 78 12 view .LVU53
+ 188 001e 8DF80230 		strb	r3, [sp, #2]
+  79:Cybergear/cybergear.c **** 	tx_data[3]=0x00;
+ 189              		.loc 1 79 2 is_stmt 1 view .LVU54
+ 190              		.loc 1 79 12 is_stmt 0 view .LVU55
+ 191 0022 8DF80330 		strb	r3, [sp, #3]
+  80:Cybergear/cybergear.c **** 	if(Value_type == 'f'){
+ 192              		.loc 1 80 2 is_stmt 1 view .LVU56
+ 193              		.loc 1 80 4 is_stmt 0 view .LVU57
+ 194 0026 662A     		cmp	r2, #102
+ 195 0028 0CD0     		beq	.L12
+  81:Cybergear/cybergear.c **** 		Float_to_Byte(Value);
+  82:Cybergear/cybergear.c **** 		tx_data[4]=byte[3];
+  83:Cybergear/cybergear.c **** 		tx_data[5]=byte[2];
+  84:Cybergear/cybergear.c **** 		tx_data[6]=byte[1];
+  85:Cybergear/cybergear.c **** 		tx_data[7]=byte[0];		
+  86:Cybergear/cybergear.c **** 	}
+  87:Cybergear/cybergear.c **** 	else if(Value_type == 's'){
+ 196              		.loc 1 87 7 is_stmt 1 view .LVU58
+ 197              		.loc 1 87 9 is_stmt 0 view .LVU59
+ 198 002a 732A     		cmp	r2, #115
+ 199 002c 1AD0     		beq	.L13
+ 200              	.LVL16:
+ 201              	.L10:
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 6
+
+
+  88:Cybergear/cybergear.c **** 		tx_data[4]=(uint8_t)Value;
+  89:Cybergear/cybergear.c **** 		tx_data[5]=0x00;
+  90:Cybergear/cybergear.c **** 		tx_data[6]=0x00;
+  91:Cybergear/cybergear.c **** 		tx_data[7]=0x00;				
+  92:Cybergear/cybergear.c **** 	}
+  93:Cybergear/cybergear.c **** 	HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data);	
+ 202              		.loc 1 93 2 is_stmt 1 view .LVU60
+ 203 002e 6A46     		mov	r2, sp
+ 204 0030 1449     		ldr	r1, .L14+4
+ 205 0032 1548     		ldr	r0, .L14+8
+ 206 0034 FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+ 207              	.LVL17:
+  94:Cybergear/cybergear.c **** 	HAL_Delay(1);
+ 208              		.loc 1 94 2 view .LVU61
+ 209 0038 0120     		movs	r0, #1
+ 210 003a FFF7FEFF 		bl	HAL_Delay
+ 211              	.LVL18:
+  95:Cybergear/cybergear.c **** }
+ 212              		.loc 1 95 1 is_stmt 0 view .LVU62
+ 213 003e 03B0     		add	sp, sp, #12
+ 214              		.cfi_remember_state
+ 215              		.cfi_def_cfa_offset 4
+ 216              		@ sp needed
+ 217 0040 5DF804FB 		ldr	pc, [sp], #4
+ 218              	.LVL19:
+ 219              	.L12:
+ 220              		.cfi_restore_state
+  81:Cybergear/cybergear.c **** 		tx_data[4]=byte[3];
+ 221              		.loc 1 81 3 is_stmt 1 view .LVU63
+ 222 0044 FFF7FEFF 		bl	Float_to_Byte
+ 223              	.LVL20:
+  82:Cybergear/cybergear.c **** 		tx_data[5]=byte[2];
+ 224              		.loc 1 82 3 view .LVU64
+  82:Cybergear/cybergear.c **** 		tx_data[5]=byte[2];
+ 225              		.loc 1 82 18 is_stmt 0 view .LVU65
+ 226 0048 104B     		ldr	r3, .L14+12
+ 227 004a DA78     		ldrb	r2, [r3, #3]	@ zero_extendqisi2
+  82:Cybergear/cybergear.c **** 		tx_data[5]=byte[2];
+ 228              		.loc 1 82 13 view .LVU66
+ 229 004c 8DF80420 		strb	r2, [sp, #4]
+  83:Cybergear/cybergear.c **** 		tx_data[6]=byte[1];
+ 230              		.loc 1 83 3 is_stmt 1 view .LVU67
+  83:Cybergear/cybergear.c **** 		tx_data[6]=byte[1];
+ 231              		.loc 1 83 18 is_stmt 0 view .LVU68
+ 232 0050 9A78     		ldrb	r2, [r3, #2]	@ zero_extendqisi2
+  83:Cybergear/cybergear.c **** 		tx_data[6]=byte[1];
+ 233              		.loc 1 83 13 view .LVU69
+ 234 0052 8DF80520 		strb	r2, [sp, #5]
+  84:Cybergear/cybergear.c **** 		tx_data[7]=byte[0];		
+ 235              		.loc 1 84 3 is_stmt 1 view .LVU70
+  84:Cybergear/cybergear.c **** 		tx_data[7]=byte[0];		
+ 236              		.loc 1 84 18 is_stmt 0 view .LVU71
+ 237 0056 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+  84:Cybergear/cybergear.c **** 		tx_data[7]=byte[0];		
+ 238              		.loc 1 84 13 view .LVU72
+ 239 0058 8DF80620 		strb	r2, [sp, #6]
+  85:Cybergear/cybergear.c **** 	}
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 7
+
+
+ 240              		.loc 1 85 3 is_stmt 1 view .LVU73
+  85:Cybergear/cybergear.c **** 	}
+ 241              		.loc 1 85 18 is_stmt 0 view .LVU74
+ 242 005c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  85:Cybergear/cybergear.c **** 	}
+ 243              		.loc 1 85 13 view .LVU75
+ 244 005e 8DF80730 		strb	r3, [sp, #7]
+ 245 0062 E4E7     		b	.L10
+ 246              	.LVL21:
+ 247              	.L13:
+  88:Cybergear/cybergear.c **** 		tx_data[5]=0x00;
+ 248              		.loc 1 88 3 is_stmt 1 view .LVU76
+  88:Cybergear/cybergear.c **** 		tx_data[5]=0x00;
+ 249              		.loc 1 88 14 is_stmt 0 view .LVU77
+ 250 0064 FCEEC07A 		vcvt.u32.f32	s15, s0
+ 251 0068 17EE903A 		vmov	r3, s15	@ int
+  88:Cybergear/cybergear.c **** 		tx_data[5]=0x00;
+ 252              		.loc 1 88 13 view .LVU78
+ 253 006c 8DF80430 		strb	r3, [sp, #4]
+  89:Cybergear/cybergear.c **** 		tx_data[6]=0x00;
+ 254              		.loc 1 89 3 is_stmt 1 view .LVU79
+  89:Cybergear/cybergear.c **** 		tx_data[6]=0x00;
+ 255              		.loc 1 89 13 is_stmt 0 view .LVU80
+ 256 0070 0023     		movs	r3, #0
+ 257 0072 8DF80530 		strb	r3, [sp, #5]
+  90:Cybergear/cybergear.c **** 		tx_data[7]=0x00;				
+ 258              		.loc 1 90 3 is_stmt 1 view .LVU81
+  90:Cybergear/cybergear.c **** 		tx_data[7]=0x00;				
+ 259              		.loc 1 90 13 is_stmt 0 view .LVU82
+ 260 0076 8DF80630 		strb	r3, [sp, #6]
+  91:Cybergear/cybergear.c **** 	}
+ 261              		.loc 1 91 3 is_stmt 1 view .LVU83
+  91:Cybergear/cybergear.c **** 	}
+ 262              		.loc 1 91 13 is_stmt 0 view .LVU84
+ 263 007a 8DF80730 		strb	r3, [sp, #7]
+ 264 007e D6E7     		b	.L10
+ 265              	.L15:
+ 266              		.align	2
+ 267              	.L14:
+ 268 0080 00000000 		.word	hfdcan1TxFrame
+ 269 0084 04000000 		.word	hfdcan1TxFrame+4
+ 270 0088 00000000 		.word	hfdcan1
+ 271 008c 00000000 		.word	.LANCHOR0
+ 272              		.cfi_endproc
+ 273              	.LFE332:
+ 275              		.section	.text.chack_cybergear,"ax",%progbits
+ 276              		.align	1
+ 277              		.global	chack_cybergear
+ 278              		.syntax unified
+ 279              		.thumb
+ 280              		.thumb_func
+ 282              	chack_cybergear:
+ 283              	.LVL22:
+ 284              	.LFB335:
+  96:Cybergear/cybergear.c **** 
+  97:Cybergear/cybergear.c **** /**
+  98:Cybergear/cybergear.c ****   * @brief          ÌáÈ¡µç»ú»Ø¸´Ö¡À©Õ¹IDÖÐµÄµç»úCANID
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 8
+
+
+  99:Cybergear/cybergear.c ****   * @param[in]      CAN_ID_Frame:µç»ú»Ø¸´Ö¡ÖÐµÄÀ©Õ¹CANID   
+ 100:Cybergear/cybergear.c ****   * @retval         µç»úCANID
+ 101:Cybergear/cybergear.c ****   */
+ 102:Cybergear/cybergear.c **** static uint32_t Get_Motor_ID(uint32_t CAN_ID_Frame)
+ 103:Cybergear/cybergear.c **** {
+ 104:Cybergear/cybergear.c **** 	return (CAN_ID_Frame&0xFFFF)>>8;
+ 105:Cybergear/cybergear.c **** }
+ 106:Cybergear/cybergear.c **** 
+ 107:Cybergear/cybergear.c **** /**
+ 108:Cybergear/cybergear.c ****   * @brief          µç»ú»Ø¸´Ö¡Êý¾Ý´¦Àíº¯Êý
+ 109:Cybergear/cybergear.c ****   * @param[in]      Motor:¶ÔÓ¦¿ØÖÆµç»ú½á¹¹Ìå   
+ 110:Cybergear/cybergear.c ****   * @param[in]      DataFrame:Êý¾ÝÖ¡
+ 111:Cybergear/cybergear.c ****   * @param[in]      IDFrame:À©Õ¹IDÖ¡
+ 112:Cybergear/cybergear.c ****   * @retval         None
+ 113:Cybergear/cybergear.c ****   */
+ 114:Cybergear/cybergear.c **** static void Motor_Data_Handler(MI_Motor *Motor,uint8_t DataFrame[8],uint32_t IDFrame)
+ 115:Cybergear/cybergear.c **** {	
+ 116:Cybergear/cybergear.c **** 		Motor->Angle=uint16_to_float(DataFrame[0]<<8|DataFrame[1],MIN_P,MAX_P,16);
+ 117:Cybergear/cybergear.c **** 		Motor->Speed=uint16_to_float(DataFrame[2]<<8|DataFrame[3],V_MIN,V_MAX,16);			
+ 118:Cybergear/cybergear.c **** 		Motor->Torque=uint16_to_float(DataFrame[4]<<8|DataFrame[5],T_MIN,T_MAX,16);				
+ 119:Cybergear/cybergear.c **** 		Motor->Temp=(DataFrame[6]<<8|DataFrame[7])*Temp_Gain;
+ 120:Cybergear/cybergear.c **** 		Motor->error_code=(IDFrame&0x1F0000)>>16;	
+ 121:Cybergear/cybergear.c **** }
+ 122:Cybergear/cybergear.c **** 
+ 123:Cybergear/cybergear.c **** /**
+ 124:Cybergear/cybergear.c ****   * @brief          Ð¡Ã×µç»úID¼ì²é
+ 125:Cybergear/cybergear.c ****   * @param[in]      id:  ¿ØÖÆµç»úCAN_ID¡¾³ö³§Ä¬ÈÏ0x7F¡¿
+ 126:Cybergear/cybergear.c ****   * @retval         none
+ 127:Cybergear/cybergear.c ****   */
+ 128:Cybergear/cybergear.c **** void chack_cybergear(uint8_t ID)
+ 129:Cybergear/cybergear.c **** {
+ 285              		.loc 1 129 1 is_stmt 1 view -0
+ 286              		.cfi_startproc
+ 287              		@ args = 0, pretend = 0, frame = 8
+ 288              		@ frame_needed = 0, uses_anonymous_args = 0
+ 289              		.loc 1 129 1 is_stmt 0 view .LVU86
+ 290 0000 00B5     		push	{lr}
+ 291              		.cfi_def_cfa_offset 4
+ 292              		.cfi_offset 14, -4
+ 293 0002 83B0     		sub	sp, sp, #12
+ 294              		.cfi_def_cfa_offset 16
+ 130:Cybergear/cybergear.c ****     uint8_t tx_data[8] = {0};
+ 295              		.loc 1 130 5 is_stmt 1 view .LVU87
+ 296              		.loc 1 130 13 is_stmt 0 view .LVU88
+ 297 0004 0023     		movs	r3, #0
+ 298 0006 0093     		str	r3, [sp]
+ 299 0008 0193     		str	r3, [sp, #4]
+ 131:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.Identifier = Communication_Type_GetID<<24|Master_CAN_ID<<8|ID;
+ 300              		.loc 1 131 5 is_stmt 1 view .LVU89
+ 301              		.loc 1 131 85 is_stmt 0 view .LVU90
+ 302 000a 40F47D40 		orr	r0, r0, #64768
+ 303              	.LVL23:
+ 304              		.loc 1 131 38 view .LVU91
+ 305 000e 0549     		ldr	r1, .L18
+ 306 0010 41F8040F 		str	r0, [r1, #4]!
+ 132:Cybergear/cybergear.c ****     HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data);
+ 307              		.loc 1 132 5 is_stmt 1 view .LVU92
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 9
+
+
+ 308 0014 6A46     		mov	r2, sp
+ 309 0016 0448     		ldr	r0, .L18+4
+ 310 0018 FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+ 311              	.LVL24:
+ 133:Cybergear/cybergear.c **** }
+ 312              		.loc 1 133 1 is_stmt 0 view .LVU93
+ 313 001c 03B0     		add	sp, sp, #12
+ 314              		.cfi_def_cfa_offset 4
+ 315              		@ sp needed
+ 316 001e 5DF804FB 		ldr	pc, [sp], #4
+ 317              	.L19:
+ 318 0022 00BF     		.align	2
+ 319              	.L18:
+ 320 0024 00000000 		.word	hfdcan1TxFrame
+ 321 0028 00000000 		.word	hfdcan1
+ 322              		.cfi_endproc
+ 323              	.LFE335:
+ 325              		.section	.text.start_cybergear,"ax",%progbits
+ 326              		.align	1
+ 327              		.global	start_cybergear
+ 328              		.syntax unified
+ 329              		.thumb
+ 330              		.thumb_func
+ 332              	start_cybergear:
+ 333              	.LVL25:
+ 334              	.LFB336:
+ 134:Cybergear/cybergear.c **** 
+ 135:Cybergear/cybergear.c **** /**
+ 136:Cybergear/cybergear.c ****   * @brief          Ê¹ÄÜÐ¡Ã×µç»ú
+ 137:Cybergear/cybergear.c ****   * @param[in]      Motor:¶ÔÓ¦¿ØÖÆµç»ú½á¹¹Ìå   
+ 138:Cybergear/cybergear.c ****   * @retval         none
+ 139:Cybergear/cybergear.c ****   */
+ 140:Cybergear/cybergear.c **** void start_cybergear(MI_Motor *Motor)
+ 141:Cybergear/cybergear.c **** {
+ 335              		.loc 1 141 1 is_stmt 1 view -0
+ 336              		.cfi_startproc
+ 337              		@ args = 0, pretend = 0, frame = 8
+ 338              		@ frame_needed = 0, uses_anonymous_args = 0
+ 339              		.loc 1 141 1 is_stmt 0 view .LVU95
+ 340 0000 00B5     		push	{lr}
+ 341              		.cfi_def_cfa_offset 4
+ 342              		.cfi_offset 14, -4
+ 343 0002 83B0     		sub	sp, sp, #12
+ 344              		.cfi_def_cfa_offset 16
+ 142:Cybergear/cybergear.c ****     uint8_t tx_data[8] = {0}; 
+ 345              		.loc 1 142 5 is_stmt 1 view .LVU96
+ 346              		.loc 1 142 13 is_stmt 0 view .LVU97
+ 347 0004 0023     		movs	r3, #0
+ 348 0006 0093     		str	r3, [sp]
+ 349 0008 0193     		str	r3, [sp, #4]
+ 143:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.Identifier = Communication_Type_MotorEnable<<24|Master_CAN_ID<<8|Motor->C
+ 350              		.loc 1 143 5 is_stmt 1 view .LVU98
+ 351              		.loc 1 143 97 is_stmt 0 view .LVU99
+ 352 000a 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 353              		.loc 1 143 91 view .LVU100
+ 354 000c 43F04073 		orr	r3, r3, #50331648
+ 355 0010 43F47D43 		orr	r3, r3, #64768
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 10
+
+
+ 356              		.loc 1 143 38 view .LVU101
+ 357 0014 0449     		ldr	r1, .L22
+ 358 0016 41F8043F 		str	r3, [r1, #4]!
+ 144:Cybergear/cybergear.c ****     HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data);
+ 359              		.loc 1 144 5 is_stmt 1 view .LVU102
+ 360 001a 6A46     		mov	r2, sp
+ 361 001c 0348     		ldr	r0, .L22+4
+ 362              	.LVL26:
+ 363              		.loc 1 144 5 is_stmt 0 view .LVU103
+ 364 001e FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+ 365              	.LVL27:
+ 145:Cybergear/cybergear.c **** }
+ 366              		.loc 1 145 1 view .LVU104
+ 367 0022 03B0     		add	sp, sp, #12
+ 368              		.cfi_def_cfa_offset 4
+ 369              		@ sp needed
+ 370 0024 5DF804FB 		ldr	pc, [sp], #4
+ 371              	.L23:
+ 372              		.align	2
+ 373              	.L22:
+ 374 0028 00000000 		.word	hfdcan1TxFrame
+ 375 002c 00000000 		.word	hfdcan1
+ 376              		.cfi_endproc
+ 377              	.LFE336:
+ 379              		.section	.text.stop_cybergear,"ax",%progbits
+ 380              		.align	1
+ 381              		.global	stop_cybergear
+ 382              		.syntax unified
+ 383              		.thumb
+ 384              		.thumb_func
+ 386              	stop_cybergear:
+ 387              	.LVL28:
+ 388              	.LFB337:
+ 146:Cybergear/cybergear.c **** 
+ 147:Cybergear/cybergear.c **** /**
+ 148:Cybergear/cybergear.c ****   * @brief          Í£Ö¹µç»ú
+ 149:Cybergear/cybergear.c ****   * @param[in]      Motor:¶ÔÓ¦¿ØÖÆµç»ú½á¹¹Ìå   
+ 150:Cybergear/cybergear.c ****   * @param[in]      clear_error:Çå³ý´íÎóÎ»£¨0 ²»Çå³ý 1Çå³ý£©
+ 151:Cybergear/cybergear.c ****   * @retval         None
+ 152:Cybergear/cybergear.c ****   */
+ 153:Cybergear/cybergear.c **** void stop_cybergear(MI_Motor *Motor,uint8_t clear_error)
+ 154:Cybergear/cybergear.c **** {
+ 389              		.loc 1 154 1 is_stmt 1 view -0
+ 390              		.cfi_startproc
+ 391              		@ args = 0, pretend = 0, frame = 8
+ 392              		@ frame_needed = 0, uses_anonymous_args = 0
+ 393              		.loc 1 154 1 is_stmt 0 view .LVU106
+ 394 0000 00B5     		push	{lr}
+ 395              		.cfi_def_cfa_offset 4
+ 396              		.cfi_offset 14, -4
+ 397 0002 83B0     		sub	sp, sp, #12
+ 398              		.cfi_def_cfa_offset 16
+ 155:Cybergear/cybergear.c **** 	uint8_t tx_data[8]={0};
+ 399              		.loc 1 155 2 is_stmt 1 view .LVU107
+ 400              		.loc 1 155 10 is_stmt 0 view .LVU108
+ 401 0004 0023     		movs	r3, #0
+ 402 0006 0093     		str	r3, [sp]
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 11
+
+
+ 403 0008 0193     		str	r3, [sp, #4]
+ 156:Cybergear/cybergear.c **** 	tx_data[0]=clear_error;//Çå³ý´íÎóÎ»ÉèÖÃ
+ 404              		.loc 1 156 2 is_stmt 1 view .LVU109
+ 405              		.loc 1 156 12 is_stmt 0 view .LVU110
+ 406 000a 8DF80010 		strb	r1, [sp]
+ 157:Cybergear/cybergear.c **** 	hfdcan1TxFrame.Header.Identifier = Communication_Type_MotorStop<<24|Master_CAN_ID<<8|Motor->CAN_ID
+ 407              		.loc 1 157 2 is_stmt 1 view .LVU111
+ 408              		.loc 1 157 92 is_stmt 0 view .LVU112
+ 409 000e 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 410              		.loc 1 157 86 view .LVU113
+ 411 0010 43F08063 		orr	r3, r3, #67108864
+ 412 0014 43F47D43 		orr	r3, r3, #64768
+ 413              		.loc 1 157 35 view .LVU114
+ 414 0018 0449     		ldr	r1, .L26
+ 415              	.LVL29:
+ 416              		.loc 1 157 35 view .LVU115
+ 417 001a 41F8043F 		str	r3, [r1, #4]!
+ 158:Cybergear/cybergear.c ****     HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data);
+ 418              		.loc 1 158 5 is_stmt 1 view .LVU116
+ 419 001e 6A46     		mov	r2, sp
+ 420 0020 0348     		ldr	r0, .L26+4
+ 421              	.LVL30:
+ 422              		.loc 1 158 5 is_stmt 0 view .LVU117
+ 423 0022 FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+ 424              	.LVL31:
+ 159:Cybergear/cybergear.c **** }
+ 425              		.loc 1 159 1 view .LVU118
+ 426 0026 03B0     		add	sp, sp, #12
+ 427              		.cfi_def_cfa_offset 4
+ 428              		@ sp needed
+ 429 0028 5DF804FB 		ldr	pc, [sp], #4
+ 430              	.L27:
+ 431              		.align	2
+ 432              	.L26:
+ 433 002c 00000000 		.word	hfdcan1TxFrame
+ 434 0030 00000000 		.word	hfdcan1
+ 435              		.cfi_endproc
+ 436              	.LFE337:
+ 438              		.section	.text.set_mode_cybergear,"ax",%progbits
+ 439              		.align	1
+ 440              		.global	set_mode_cybergear
+ 441              		.syntax unified
+ 442              		.thumb
+ 443              		.thumb_func
+ 445              	set_mode_cybergear:
+ 446              	.LVL32:
+ 447              	.LFB338:
+ 160:Cybergear/cybergear.c **** 
+ 161:Cybergear/cybergear.c **** /**
+ 162:Cybergear/cybergear.c ****   * @brief          ÉèÖÃµç»úÄ£Ê½(±ØÐëÍ£Ö¹Ê±µ÷Õû£¡)
+ 163:Cybergear/cybergear.c ****   * @param[in]      Motor:  µç»ú½á¹¹Ìå
+ 164:Cybergear/cybergear.c ****   * @param[in]      Mode:   µç»ú¹¤×÷Ä£Ê½£¨1.ÔË¶¯Ä£Ê½Motion_mode 2. Î»ÖÃÄ£Ê½Position_mode 3. ËÙ¶ÈÄ£Ê
+ 165:Cybergear/cybergear.c ****   * @retval         none
+ 166:Cybergear/cybergear.c ****   */
+ 167:Cybergear/cybergear.c **** void set_mode_cybergear(MI_Motor *Motor,uint8_t Mode)
+ 168:Cybergear/cybergear.c **** {	
+ 448              		.loc 1 168 1 is_stmt 1 view -0
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 12
+
+
+ 449              		.cfi_startproc
+ 450              		@ args = 0, pretend = 0, frame = 0
+ 451              		@ frame_needed = 0, uses_anonymous_args = 0
+ 452              		.loc 1 168 1 is_stmt 0 view .LVU120
+ 453 0000 10B5     		push	{r4, lr}
+ 454              		.cfi_def_cfa_offset 8
+ 455              		.cfi_offset 4, -8
+ 456              		.cfi_offset 14, -4
+ 457 0002 2DED028B 		vpush.64	{d8}
+ 458              		.cfi_def_cfa_offset 16
+ 459              		.cfi_offset 80, -16
+ 460              		.cfi_offset 81, -12
+ 461 0006 0446     		mov	r4, r0
+ 462 0008 08EE101A 		vmov	s16, r1	@ int
+ 169:Cybergear/cybergear.c **** 	stop_cybergear(Motor, 0);
+ 463              		.loc 1 169 2 is_stmt 1 view .LVU121
+ 464 000c 0021     		movs	r1, #0
+ 465              	.LVL33:
+ 466              		.loc 1 169 2 is_stmt 0 view .LVU122
+ 467 000e FFF7FEFF 		bl	stop_cybergear
+ 468              	.LVL34:
+ 170:Cybergear/cybergear.c **** 	Set_Motor_Parameter(Motor,Run_mode,Mode,'s');
+ 469              		.loc 1 170 2 is_stmt 1 view .LVU123
+ 470 0012 7322     		movs	r2, #115
+ 471 0014 B8EE480A 		vcvt.f32.u32	s0, s16
+ 472 0018 47F20501 		movw	r1, #28677
+ 473 001c 2046     		mov	r0, r4
+ 474 001e FFF7FEFF 		bl	Set_Motor_Parameter
+ 475              	.LVL35:
+ 171:Cybergear/cybergear.c **** 	start_cybergear(Motor);
+ 476              		.loc 1 171 2 view .LVU124
+ 477 0022 2046     		mov	r0, r4
+ 478 0024 FFF7FEFF 		bl	start_cybergear
+ 479              	.LVL36:
+ 172:Cybergear/cybergear.c **** }
+ 480              		.loc 1 172 1 is_stmt 0 view .LVU125
+ 481 0028 BDEC028B 		vldm	sp!, {d8}
+ 482              		.cfi_restore 80
+ 483              		.cfi_restore 81
+ 484              		.cfi_def_cfa_offset 8
+ 485 002c 10BD     		pop	{r4, pc}
+ 486              		.loc 1 172 1 view .LVU126
+ 487              		.cfi_endproc
+ 488              	.LFE338:
+ 490              		.section	.text.set_position_cybergear,"ax",%progbits
+ 491              		.align	1
+ 492              		.global	set_position_cybergear
+ 493              		.syntax unified
+ 494              		.thumb
+ 495              		.thumb_func
+ 497              	set_position_cybergear:
+ 498              	.LVL37:
+ 499              	.LFB339:
+ 173:Cybergear/cybergear.c **** 
+ 174:Cybergear/cybergear.c **** /**
+ 175:Cybergear/cybergear.c ****   * @brief          Î»ÖÃ¿ØÖÆÄ£Ê½ÏÂÉèÖÃÎ»ÖÃ
+ 176:Cybergear/cybergear.c ****   * @param[in]      Motor:  µç»ú½á¹¹Ìå
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 13
+
+
+ 177:Cybergear/cybergear.c ****   * @param[in]      position:Ä¿±êÎ»ÖÃ
+ 178:Cybergear/cybergear.c ****   * @retval         none
+ 179:Cybergear/cybergear.c ****   */
+ 180:Cybergear/cybergear.c **** void set_position_cybergear(MI_Motor *Motor, float position, float max_speed, float limit_current ,
+ 181:Cybergear/cybergear.c **** {
+ 500              		.loc 1 181 1 is_stmt 1 view -0
+ 501              		.cfi_startproc
+ 502              		@ args = 0, pretend = 0, frame = 0
+ 503              		@ frame_needed = 0, uses_anonymous_args = 0
+ 504              		.loc 1 181 1 is_stmt 0 view .LVU128
+ 505 0000 10B5     		push	{r4, lr}
+ 506              		.cfi_def_cfa_offset 8
+ 507              		.cfi_offset 4, -8
+ 508              		.cfi_offset 14, -4
+ 509 0002 2DED048B 		vpush.64	{d8, d9}
+ 510              		.cfi_def_cfa_offset 24
+ 511              		.cfi_offset 80, -24
+ 512              		.cfi_offset 81, -20
+ 513              		.cfi_offset 82, -16
+ 514              		.cfi_offset 83, -12
+ 515 0006 0446     		mov	r4, r0
+ 516 0008 B0EE408A 		vmov.f32	s16, s0
+ 517 000c B0EE419A 		vmov.f32	s18, s2
+ 518 0010 F0EE618A 		vmov.f32	s17, s3
+ 182:Cybergear/cybergear.c **** 	Set_Motor_Parameter(Motor,Limit_Spd,max_speed,'f');
+ 519              		.loc 1 182 2 is_stmt 1 view .LVU129
+ 520 0014 6622     		movs	r2, #102
+ 521 0016 B0EE600A 		vmov.f32	s0, s1
+ 522              	.LVL38:
+ 523              		.loc 1 182 2 is_stmt 0 view .LVU130
+ 524 001a 47F21701 		movw	r1, #28695
+ 525 001e FFF7FEFF 		bl	Set_Motor_Parameter
+ 526              	.LVL39:
+ 183:Cybergear/cybergear.c **** 	Set_Motor_Parameter(Motor,Limit_Cur,limit_current,'f');
+ 527              		.loc 1 183 2 is_stmt 1 view .LVU131
+ 528 0022 6622     		movs	r2, #102
+ 529 0024 B0EE490A 		vmov.f32	s0, s18
+ 530 0028 47F21801 		movw	r1, #28696
+ 531 002c 2046     		mov	r0, r4
+ 532 002e FFF7FEFF 		bl	Set_Motor_Parameter
+ 533              	.LVL40:
+ 184:Cybergear/cybergear.c **** 	Set_Motor_Parameter(Motor,Loc_Kp,kp,'f');
+ 534              		.loc 1 184 2 view .LVU132
+ 535 0032 6622     		movs	r2, #102
+ 536 0034 B0EE680A 		vmov.f32	s0, s17
+ 537 0038 47F21E01 		movw	r1, #28702
+ 538 003c 2046     		mov	r0, r4
+ 539 003e FFF7FEFF 		bl	Set_Motor_Parameter
+ 540              	.LVL41:
+ 185:Cybergear/cybergear.c **** 	Set_Motor_Parameter(Motor,Loc_Ref,position,'f');
+ 541              		.loc 1 185 2 view .LVU133
+ 542 0042 6622     		movs	r2, #102
+ 543 0044 B0EE480A 		vmov.f32	s0, s16
+ 544 0048 47F21601 		movw	r1, #28694
+ 545 004c 2046     		mov	r0, r4
+ 546 004e FFF7FEFF 		bl	Set_Motor_Parameter
+ 547              	.LVL42:
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 14
+
+
+ 186:Cybergear/cybergear.c **** }
+ 548              		.loc 1 186 1 is_stmt 0 view .LVU134
+ 549 0052 BDEC048B 		vldm	sp!, {d8-d9}
+ 550              		.cfi_restore 82
+ 551              		.cfi_restore 83
+ 552              		.cfi_restore 80
+ 553              		.cfi_restore 81
+ 554              		.cfi_def_cfa_offset 8
+ 555              	.LVL43:
+ 556              		.loc 1 186 1 view .LVU135
+ 557 0056 10BD     		pop	{r4, pc}
+ 558              		.loc 1 186 1 view .LVU136
+ 559              		.cfi_endproc
+ 560              	.LFE339:
+ 562              		.section	.text.set_speed_cybergear,"ax",%progbits
+ 563              		.align	1
+ 564              		.global	set_speed_cybergear
+ 565              		.syntax unified
+ 566              		.thumb
+ 567              		.thumb_func
+ 569              	set_speed_cybergear:
+ 570              	.LVL44:
+ 571              	.LFB340:
+ 187:Cybergear/cybergear.c **** /**
+ 188:Cybergear/cybergear.c ****   * @brief          ËÙ¶È¿ØÖÆÄ£Ê½ÏÂÉèÖÃËÙ¶È
+ 189:Cybergear/cybergear.c ****   * @param[in]      Motor:  µç»ú½á¹¹Ìå
+ 190:Cybergear/cybergear.c ****   * @param[in]      speed:Ä¿±êËÙ¶È
+ 191:Cybergear/cybergear.c ****   * @retval         none
+ 192:Cybergear/cybergear.c ****   */
+ 193:Cybergear/cybergear.c **** void set_speed_cybergear(MI_Motor *Motor, float speed)
+ 194:Cybergear/cybergear.c **** {
+ 572              		.loc 1 194 1 is_stmt 1 view -0
+ 573              		.cfi_startproc
+ 574              		@ args = 0, pretend = 0, frame = 0
+ 575              		@ frame_needed = 0, uses_anonymous_args = 0
+ 576              		.loc 1 194 1 is_stmt 0 view .LVU138
+ 577 0000 08B5     		push	{r3, lr}
+ 578              		.cfi_def_cfa_offset 8
+ 579              		.cfi_offset 3, -8
+ 580              		.cfi_offset 14, -4
+ 195:Cybergear/cybergear.c **** 	Set_Motor_Parameter(Motor,Spd_Ref,speed,'f');
+ 581              		.loc 1 195 2 is_stmt 1 view .LVU139
+ 582 0002 6622     		movs	r2, #102
+ 583 0004 47F20A01 		movw	r1, #28682
+ 584 0008 FFF7FEFF 		bl	Set_Motor_Parameter
+ 585              	.LVL45:
+ 196:Cybergear/cybergear.c **** }
+ 586              		.loc 1 196 1 is_stmt 0 view .LVU140
+ 587 000c 08BD     		pop	{r3, pc}
+ 588              		.cfi_endproc
+ 589              	.LFE340:
+ 591              		.section	.text.set_current_cybergear,"ax",%progbits
+ 592              		.align	1
+ 593              		.global	set_current_cybergear
+ 594              		.syntax unified
+ 595              		.thumb
+ 596              		.thumb_func
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 15
+
+
+ 598              	set_current_cybergear:
+ 599              	.LVL46:
+ 600              	.LFB341:
+ 197:Cybergear/cybergear.c **** 
+ 198:Cybergear/cybergear.c **** /**
+ 199:Cybergear/cybergear.c ****   * @brief          µçÁ÷¿ØÖÆÄ£Ê½ÏÂÉèÖÃµçÁ÷
+ 200:Cybergear/cybergear.c ****   * @param[in]      Motor:  µç»ú½á¹¹Ìå
+ 201:Cybergear/cybergear.c ****   * @param[in]      Current:µçÁ÷ÉèÖÃ
+ 202:Cybergear/cybergear.c ****   * @retval         none
+ 203:Cybergear/cybergear.c ****   */
+ 204:Cybergear/cybergear.c **** void set_current_cybergear(MI_Motor *Motor,float Current)
+ 205:Cybergear/cybergear.c **** {
+ 601              		.loc 1 205 1 is_stmt 1 view -0
+ 602              		.cfi_startproc
+ 603              		@ args = 0, pretend = 0, frame = 0
+ 604              		@ frame_needed = 0, uses_anonymous_args = 0
+ 605              		.loc 1 205 1 is_stmt 0 view .LVU142
+ 606 0000 08B5     		push	{r3, lr}
+ 607              		.cfi_def_cfa_offset 8
+ 608              		.cfi_offset 3, -8
+ 609              		.cfi_offset 14, -4
+ 206:Cybergear/cybergear.c **** 	Set_Motor_Parameter(Motor,Iq_Ref,Current,'f');
+ 610              		.loc 1 206 2 is_stmt 1 view .LVU143
+ 611 0002 6622     		movs	r2, #102
+ 612 0004 47F20601 		movw	r1, #28678
+ 613 0008 FFF7FEFF 		bl	Set_Motor_Parameter
+ 614              	.LVL47:
+ 207:Cybergear/cybergear.c **** }
+ 615              		.loc 1 207 1 is_stmt 0 view .LVU144
+ 616 000c 08BD     		pop	{r3, pc}
+ 617              		.cfi_endproc
+ 618              	.LFE341:
+ 620              		.section	.text.set_zeropos_cybergear,"ax",%progbits
+ 621              		.align	1
+ 622              		.global	set_zeropos_cybergear
+ 623              		.syntax unified
+ 624              		.thumb
+ 625              		.thumb_func
+ 627              	set_zeropos_cybergear:
+ 628              	.LVL48:
+ 629              	.LFB342:
+ 208:Cybergear/cybergear.c **** /**
+ 209:Cybergear/cybergear.c ****   * @brief          ÉèÖÃµç»úÁãµã
+ 210:Cybergear/cybergear.c ****   * @param[in]      Motor:  µç»ú½á¹¹Ìå
+ 211:Cybergear/cybergear.c ****   * @retval         none
+ 212:Cybergear/cybergear.c ****   */
+ 213:Cybergear/cybergear.c **** void set_zeropos_cybergear(MI_Motor *Motor)
+ 214:Cybergear/cybergear.c **** {
+ 630              		.loc 1 214 1 is_stmt 1 view -0
+ 631              		.cfi_startproc
+ 632              		@ args = 0, pretend = 0, frame = 8
+ 633              		@ frame_needed = 0, uses_anonymous_args = 0
+ 634              		.loc 1 214 1 is_stmt 0 view .LVU146
+ 635 0000 00B5     		push	{lr}
+ 636              		.cfi_def_cfa_offset 4
+ 637              		.cfi_offset 14, -4
+ 638 0002 83B0     		sub	sp, sp, #12
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 16
+
+
+ 639              		.cfi_def_cfa_offset 16
+ 215:Cybergear/cybergear.c **** 	uint8_t tx_data[8]={0};
+ 640              		.loc 1 215 2 is_stmt 1 view .LVU147
+ 641              		.loc 1 215 10 is_stmt 0 view .LVU148
+ 642 0004 0023     		movs	r3, #0
+ 643 0006 0093     		str	r3, [sp]
+ 644 0008 0193     		str	r3, [sp, #4]
+ 216:Cybergear/cybergear.c **** 	hfdcan1TxFrame.Header.Identifier = Communication_Type_SetPosZero<<24|Master_CAN_ID<<8|Motor->CAN_I
+ 645              		.loc 1 216 2 is_stmt 1 view .LVU149
+ 646              		.loc 1 216 93 is_stmt 0 view .LVU150
+ 647 000a 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 648              		.loc 1 216 87 view .LVU151
+ 649 000c 43F0C063 		orr	r3, r3, #100663296
+ 650 0010 43F47D43 		orr	r3, r3, #64768
+ 651              		.loc 1 216 35 view .LVU152
+ 652 0014 0449     		ldr	r1, .L38
+ 653 0016 41F8043F 		str	r3, [r1, #4]!
+ 217:Cybergear/cybergear.c **** 	HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data);
+ 654              		.loc 1 217 2 is_stmt 1 view .LVU153
+ 655 001a 6A46     		mov	r2, sp
+ 656 001c 0348     		ldr	r0, .L38+4
+ 657              	.LVL49:
+ 658              		.loc 1 217 2 is_stmt 0 view .LVU154
+ 659 001e FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+ 660              	.LVL50:
+ 218:Cybergear/cybergear.c **** }
+ 661              		.loc 1 218 1 view .LVU155
+ 662 0022 03B0     		add	sp, sp, #12
+ 663              		.cfi_def_cfa_offset 4
+ 664              		@ sp needed
+ 665 0024 5DF804FB 		ldr	pc, [sp], #4
+ 666              	.L39:
+ 667              		.align	2
+ 668              	.L38:
+ 669 0028 00000000 		.word	hfdcan1TxFrame
+ 670 002c 00000000 		.word	hfdcan1
+ 671              		.cfi_endproc
+ 672              	.LFE342:
+ 674              		.section	.text.set_CANID_cybergear,"ax",%progbits
+ 675              		.align	1
+ 676              		.global	set_CANID_cybergear
+ 677              		.syntax unified
+ 678              		.thumb
+ 679              		.thumb_func
+ 681              	set_CANID_cybergear:
+ 682              	.LVL51:
+ 683              	.LFB343:
+ 219:Cybergear/cybergear.c **** /**
+ 220:Cybergear/cybergear.c ****   * @brief          ÉèÖÃµç»úCANID
+ 221:Cybergear/cybergear.c ****   * @param[in]      Motor:  µç»ú½á¹¹Ìå
+ 222:Cybergear/cybergear.c ****   * @param[in]      Motor:  ÉèÖÃÐÂID
+ 223:Cybergear/cybergear.c ****   * @retval         none
+ 224:Cybergear/cybergear.c ****   */
+ 225:Cybergear/cybergear.c **** void set_CANID_cybergear(MI_Motor *Motor,uint8_t CAN_ID)
+ 226:Cybergear/cybergear.c **** {
+ 684              		.loc 1 226 1 is_stmt 1 view -0
+ 685              		.cfi_startproc
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 17
+
+
+ 686              		@ args = 0, pretend = 0, frame = 8
+ 687              		@ frame_needed = 0, uses_anonymous_args = 0
+ 688              		.loc 1 226 1 is_stmt 0 view .LVU157
+ 689 0000 00B5     		push	{lr}
+ 690              		.cfi_def_cfa_offset 4
+ 691              		.cfi_offset 14, -4
+ 692 0002 83B0     		sub	sp, sp, #12
+ 693              		.cfi_def_cfa_offset 16
+ 694 0004 0A46     		mov	r2, r1
+ 227:Cybergear/cybergear.c **** 	uint8_t tx_data[8]={0};
+ 695              		.loc 1 227 2 is_stmt 1 view .LVU158
+ 696              		.loc 1 227 10 is_stmt 0 view .LVU159
+ 697 0006 0023     		movs	r3, #0
+ 698 0008 0093     		str	r3, [sp]
+ 699 000a 0193     		str	r3, [sp, #4]
+ 228:Cybergear/cybergear.c **** 	hfdcan1TxFrame.Header.Identifier = Communication_Type_CanID<<24|CAN_ID<<16|Master_CAN_ID<<8|Motor-
+ 700              		.loc 1 228 2 is_stmt 1 view .LVU160
+ 701              		.loc 1 228 72 is_stmt 0 view .LVU161
+ 702 000c 0B04     		lsls	r3, r1, #16
+ 703              		.loc 1 228 76 view .LVU162
+ 704 000e 43F0E063 		orr	r3, r3, #117440512
+ 705 0012 43F47D43 		orr	r3, r3, #64768
+ 706              		.loc 1 228 99 view .LVU163
+ 707 0016 0178     		ldrb	r1, [r0]	@ zero_extendqisi2
+ 708              	.LVL52:
+ 709              		.loc 1 228 93 view .LVU164
+ 710 0018 0B43     		orrs	r3, r3, r1
+ 711              		.loc 1 228 35 view .LVU165
+ 712 001a 0549     		ldr	r1, .L42
+ 713 001c 41F8043F 		str	r3, [r1, #4]!
+ 229:Cybergear/cybergear.c ****     Motor->CAN_ID = CAN_ID;//½«ÐÂµÄIDµ¼Èëµç»ú½á¹¹Ìå
+ 714              		.loc 1 229 5 is_stmt 1 view .LVU166
+ 715              		.loc 1 229 19 is_stmt 0 view .LVU167
+ 716 0020 0270     		strb	r2, [r0]
+ 230:Cybergear/cybergear.c ****     HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data);	
+ 717              		.loc 1 230 5 is_stmt 1 view .LVU168
+ 718 0022 6A46     		mov	r2, sp
+ 719 0024 0348     		ldr	r0, .L42+4
+ 720              	.LVL53:
+ 721              		.loc 1 230 5 is_stmt 0 view .LVU169
+ 722 0026 FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+ 723              	.LVL54:
+ 231:Cybergear/cybergear.c **** } 
+ 724              		.loc 1 231 1 view .LVU170
+ 725 002a 03B0     		add	sp, sp, #12
+ 726              		.cfi_def_cfa_offset 4
+ 727              		@ sp needed
+ 728 002c 5DF804FB 		ldr	pc, [sp], #4
+ 729              	.L43:
+ 730              		.align	2
+ 731              	.L42:
+ 732 0030 00000000 		.word	hfdcan1TxFrame
+ 733 0034 00000000 		.word	hfdcan1
+ 734              		.cfi_endproc
+ 735              	.LFE343:
+ 737              		.section	.text.init_cybergear,"ax",%progbits
+ 738              		.align	1
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 18
+
+
+ 739              		.global	init_cybergear
+ 740              		.syntax unified
+ 741              		.thumb
+ 742              		.thumb_func
+ 744              	init_cybergear:
+ 745              	.LVL55:
+ 746              	.LFB344:
+ 232:Cybergear/cybergear.c **** /**
+ 233:Cybergear/cybergear.c ****   * @brief          Ð¡Ã×µç»ú³õÊ¼»¯
+ 234:Cybergear/cybergear.c ****   * @param[in]      Motor:  µç»ú½á¹¹Ìå
+ 235:Cybergear/cybergear.c ****   * @param[in]      Can_Id: Ð¡Ã×µç»úID(Ä¬ÈÏ0x7F)
+ 236:Cybergear/cybergear.c ****   * @param[in]      Motor_Num: µç»ú±àºÅ
+ 237:Cybergear/cybergear.c ****   * @param[in]      mode: µç»ú¹¤×÷Ä£Ê½£¨0.ÔË¶¯Ä£Ê½Motion_mode 1. Î»ÖÃÄ£Ê½Position_mode 2. ËÙ¶ÈÄ£Ê½S
+ 238:Cybergear/cybergear.c ****   * @retval         none
+ 239:Cybergear/cybergear.c ****   */
+ 240:Cybergear/cybergear.c **** void init_cybergear(MI_Motor *Motor,uint8_t Can_Id, uint8_t mode)
+ 241:Cybergear/cybergear.c **** {
+ 747              		.loc 1 241 1 is_stmt 1 view -0
+ 748              		.cfi_startproc
+ 749              		@ args = 0, pretend = 0, frame = 0
+ 750              		@ frame_needed = 0, uses_anonymous_args = 0
+ 751              		.loc 1 241 1 is_stmt 0 view .LVU172
+ 752 0000 70B5     		push	{r4, r5, r6, lr}
+ 753              		.cfi_def_cfa_offset 16
+ 754              		.cfi_offset 4, -16
+ 755              		.cfi_offset 5, -12
+ 756              		.cfi_offset 6, -8
+ 757              		.cfi_offset 14, -4
+ 758 0002 0546     		mov	r5, r0
+ 242:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.Identifier=0;
+ 759              		.loc 1 242 5 is_stmt 1 view .LVU173
+ 760              		.loc 1 242 37 is_stmt 0 view .LVU174
+ 761 0004 0A4B     		ldr	r3, .L46
+ 762 0006 0024     		movs	r4, #0
+ 763 0008 5C60     		str	r4, [r3, #4]
+ 243:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.IdType=FDCAN_EXTENDED_ID;
+ 764              		.loc 1 243 5 is_stmt 1 view .LVU175
+ 765              		.loc 1 243 33 is_stmt 0 view .LVU176
+ 766 000a 4FF08046 		mov	r6, #1073741824
+ 767 000e 9E60     		str	r6, [r3, #8]
+ 244:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.TxFrameType=FDCAN_DATA_FRAME;
+ 768              		.loc 1 244 5 is_stmt 1 view .LVU177
+ 769              		.loc 1 244 38 is_stmt 0 view .LVU178
+ 770 0010 DC60     		str	r4, [r3, #12]
+ 245:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.DataLength=FDCAN_DLC_BYTES_8;
+ 771              		.loc 1 245 5 is_stmt 1 view .LVU179
+ 772              		.loc 1 245 37 is_stmt 0 view .LVU180
+ 773 0012 0826     		movs	r6, #8
+ 774 0014 1E61     		str	r6, [r3, #16]
+ 246:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.ErrorStateIndicator=FDCAN_ESI_ACTIVE;
+ 775              		.loc 1 246 5 is_stmt 1 view .LVU181
+ 776              		.loc 1 246 46 is_stmt 0 view .LVU182
+ 777 0016 5C61     		str	r4, [r3, #20]
+ 247:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.BitRateSwitch=FDCAN_BRS_OFF;
+ 778              		.loc 1 247 5 is_stmt 1 view .LVU183
+ 779              		.loc 1 247 40 is_stmt 0 view .LVU184
+ 780 0018 9C61     		str	r4, [r3, #24]
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 19
+
+
+ 248:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.FDFormat=FDCAN_CLASSIC_CAN;
+ 781              		.loc 1 248 5 is_stmt 1 view .LVU185
+ 782              		.loc 1 248 35 is_stmt 0 view .LVU186
+ 783 001a DC61     		str	r4, [r3, #28]
+ 249:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.TxEventFifoControl=FDCAN_NO_TX_EVENTS;
+ 784              		.loc 1 249 5 is_stmt 1 view .LVU187
+ 785              		.loc 1 249 45 is_stmt 0 view .LVU188
+ 786 001c 1C62     		str	r4, [r3, #32]
+ 250:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.MessageMarker=0;
+ 787              		.loc 1 250 5 is_stmt 1 view .LVU189
+ 788              		.loc 1 250 40 is_stmt 0 view .LVU190
+ 789 001e 5C62     		str	r4, [r3, #36]
+ 251:Cybergear/cybergear.c **** 
+ 252:Cybergear/cybergear.c **** 	Motor->CAN_ID=Can_Id;       //IDÉèÖÃ
+ 790              		.loc 1 252 2 is_stmt 1 view .LVU191
+ 791              		.loc 1 252 15 is_stmt 0 view .LVU192
+ 792 0020 0170     		strb	r1, [r0]
+ 253:Cybergear/cybergear.c **** 	set_mode_cybergear(Motor,mode);//ÉèÖÃµç»úÄ£Ê½
+ 793              		.loc 1 253 2 is_stmt 1 view .LVU193
+ 794 0022 1146     		mov	r1, r2
+ 795              	.LVL56:
+ 796              		.loc 1 253 2 is_stmt 0 view .LVU194
+ 797 0024 FFF7FEFF 		bl	set_mode_cybergear
+ 798              	.LVL57:
+ 254:Cybergear/cybergear.c **** 	start_cybergear(Motor);        //Ê¹ÄÜµç»ú
+ 799              		.loc 1 254 2 is_stmt 1 view .LVU195
+ 800 0028 2846     		mov	r0, r5
+ 801 002a FFF7FEFF 		bl	start_cybergear
+ 802              	.LVL58:
+ 255:Cybergear/cybergear.c **** }
+ 803              		.loc 1 255 1 is_stmt 0 view .LVU196
+ 804 002e 70BD     		pop	{r4, r5, r6, pc}
+ 805              	.LVL59:
+ 806              	.L47:
+ 807              		.loc 1 255 1 view .LVU197
+ 808              		.align	2
+ 809              	.L46:
+ 810 0030 00000000 		.word	hfdcan1TxFrame
+ 811              		.cfi_endproc
+ 812              	.LFE344:
+ 814              		.section	.text.motor_controlmode,"ax",%progbits
+ 815              		.align	1
+ 816              		.global	motor_controlmode
+ 817              		.syntax unified
+ 818              		.thumb
+ 819              		.thumb_func
+ 821              	motor_controlmode:
+ 822              	.LVL60:
+ 823              	.LFB345:
+ 256:Cybergear/cybergear.c **** /**
+ 257:Cybergear/cybergear.c ****   * @brief          Ð¡Ã×ÔË¿ØÄ£Ê½Ö¸Áî
+ 258:Cybergear/cybergear.c ****   * @param[in]      Motor:  Ä¿±êµç»ú½á¹¹Ìå
+ 259:Cybergear/cybergear.c ****   * @param[in]      torque: Á¦¾ØÉèÖÃ[-12,12] N*M
+ 260:Cybergear/cybergear.c ****   * @param[in]      MechPosition: Î»ÖÃÉèÖÃ[-12.5,12.5] rad
+ 261:Cybergear/cybergear.c ****   * @param[in]      speed: ËÙ¶ÈÉèÖÃ[-30,30] rpm
+ 262:Cybergear/cybergear.c ****   * @param[in]      kp: ±ÈÀý²ÎÊýÉèÖÃ
+ 263:Cybergear/cybergear.c ****   * @param[in]      kd: Î¢·Ö²ÎÊýÉèÖÃ
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 20
+
+
+ 264:Cybergear/cybergear.c ****   * @retval         none
+ 265:Cybergear/cybergear.c ****   */
+ 266:Cybergear/cybergear.c **** void motor_controlmode(MI_Motor *Motor,float torque, float MechPosition, float speed, float kp, flo
+ 267:Cybergear/cybergear.c **** {   
+ 824              		.loc 1 267 1 is_stmt 1 view -0
+ 825              		.cfi_startproc
+ 826              		@ args = 0, pretend = 0, frame = 8
+ 827              		@ frame_needed = 0, uses_anonymous_args = 0
+ 828              		.loc 1 267 1 is_stmt 0 view .LVU199
+ 829 0000 10B5     		push	{r4, lr}
+ 830              		.cfi_def_cfa_offset 8
+ 831              		.cfi_offset 4, -8
+ 832              		.cfi_offset 14, -4
+ 833 0002 2DED048B 		vpush.64	{d8, d9}
+ 834              		.cfi_def_cfa_offset 24
+ 835              		.cfi_offset 80, -24
+ 836              		.cfi_offset 81, -20
+ 837              		.cfi_offset 82, -16
+ 838              		.cfi_offset 83, -12
+ 839 0006 82B0     		sub	sp, sp, #8
+ 840              		.cfi_def_cfa_offset 32
+ 841 0008 0446     		mov	r4, r0
+ 842 000a B0EE408A 		vmov.f32	s16, s0
+ 843 000e B0EE600A 		vmov.f32	s0, s1
+ 844              	.LVL61:
+ 845              		.loc 1 267 1 view .LVU200
+ 846 0012 F0EE419A 		vmov.f32	s19, s2
+ 847 0016 B0EE619A 		vmov.f32	s18, s3
+ 848 001a F0EE428A 		vmov.f32	s17, s4
+ 268:Cybergear/cybergear.c ****     uint8_t tx_data[8];//·¢ËÍÊý¾Ý³õÊ¼»¯
+ 849              		.loc 1 268 5 is_stmt 1 view .LVU201
+ 269:Cybergear/cybergear.c ****     //×°Ìî·¢ËÍÊý¾Ý
+ 270:Cybergear/cybergear.c ****     tx_data[0]=float_to_uint(MechPosition,P_MIN,P_MAX,16)>>8;  
+ 850              		.loc 1 270 5 view .LVU202
+ 851              		.loc 1 270 16 is_stmt 0 view .LVU203
+ 852 001e 1020     		movs	r0, #16
+ 853              	.LVL62:
+ 854              		.loc 1 270 16 view .LVU204
+ 855 0020 B2EE091A 		vmov.f32	s2, #1.25e+1
+ 856              	.LVL63:
+ 857              		.loc 1 270 16 view .LVU205
+ 858 0024 FAEE090A 		vmov.f32	s1, #-1.25e+1
+ 859              	.LVL64:
+ 860              		.loc 1 270 16 view .LVU206
+ 861 0028 FFF7FEFF 		bl	float_to_uint
+ 862              	.LVL65:
+ 863              		.loc 1 270 58 view .LVU207
+ 864 002c 0312     		asrs	r3, r0, #8
+ 865              		.loc 1 270 15 view .LVU208
+ 866 002e 8DF80030 		strb	r3, [sp]
+ 271:Cybergear/cybergear.c ****     tx_data[1]=float_to_uint(MechPosition,P_MIN,P_MAX,16);  
+ 867              		.loc 1 271 5 is_stmt 1 view .LVU209
+ 868              		.loc 1 271 15 is_stmt 0 view .LVU210
+ 869 0032 8DF80100 		strb	r0, [sp, #1]
+ 272:Cybergear/cybergear.c ****     tx_data[2]=float_to_uint(speed,V_MIN,V_MAX,16)>>8;  
+ 870              		.loc 1 272 5 is_stmt 1 view .LVU211
+ 871              		.loc 1 272 16 is_stmt 0 view .LVU212
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 21
+
+
+ 872 0036 1020     		movs	r0, #16
+ 873 0038 B3EE0E1A 		vmov.f32	s2, #3.0e+1
+ 874 003c FBEE0E0A 		vmov.f32	s1, #-3.0e+1
+ 875 0040 B0EE690A 		vmov.f32	s0, s19
+ 876 0044 FFF7FEFF 		bl	float_to_uint
+ 877              	.LVL66:
+ 878              		.loc 1 272 51 view .LVU213
+ 879 0048 0312     		asrs	r3, r0, #8
+ 880              		.loc 1 272 15 view .LVU214
+ 881 004a 8DF80230 		strb	r3, [sp, #2]
+ 273:Cybergear/cybergear.c ****     tx_data[3]=float_to_uint(speed,V_MIN,V_MAX,16);  
+ 882              		.loc 1 273 5 is_stmt 1 view .LVU215
+ 883              		.loc 1 273 15 is_stmt 0 view .LVU216
+ 884 004e 8DF80300 		strb	r0, [sp, #3]
+ 274:Cybergear/cybergear.c ****     tx_data[4]=float_to_uint(kp,KP_MIN,KP_MAX,16)>>8;  
+ 885              		.loc 1 274 5 is_stmt 1 view .LVU217
+ 886              		.loc 1 274 16 is_stmt 0 view .LVU218
+ 887 0052 DFED1B9A 		vldr.32	s19, .L50
+ 888              	.LVL67:
+ 889              		.loc 1 274 16 view .LVU219
+ 890 0056 1020     		movs	r0, #16
+ 891 0058 9FED1A1A 		vldr.32	s2, .L50+4
+ 892 005c F0EE690A 		vmov.f32	s1, s19
+ 893 0060 B0EE490A 		vmov.f32	s0, s18
+ 894 0064 FFF7FEFF 		bl	float_to_uint
+ 895              	.LVL68:
+ 896              		.loc 1 274 50 view .LVU220
+ 897 0068 0312     		asrs	r3, r0, #8
+ 898              		.loc 1 274 15 view .LVU221
+ 899 006a 8DF80430 		strb	r3, [sp, #4]
+ 275:Cybergear/cybergear.c ****     tx_data[5]=float_to_uint(kp,KP_MIN,KP_MAX,16);  
+ 900              		.loc 1 275 5 is_stmt 1 view .LVU222
+ 901              		.loc 1 275 15 is_stmt 0 view .LVU223
+ 902 006e 8DF80500 		strb	r0, [sp, #5]
+ 276:Cybergear/cybergear.c ****     tx_data[6]=float_to_uint(kd,KD_MIN,KD_MAX,16)>>8;  
+ 903              		.loc 1 276 5 is_stmt 1 view .LVU224
+ 904              		.loc 1 276 16 is_stmt 0 view .LVU225
+ 905 0072 1020     		movs	r0, #16
+ 906 0074 B1EE041A 		vmov.f32	s2, #5.0e+0
+ 907 0078 F0EE690A 		vmov.f32	s1, s19
+ 908 007c B0EE680A 		vmov.f32	s0, s17
+ 909 0080 FFF7FEFF 		bl	float_to_uint
+ 910              	.LVL69:
+ 911              		.loc 1 276 50 view .LVU226
+ 912 0084 0312     		asrs	r3, r0, #8
+ 913              		.loc 1 276 15 view .LVU227
+ 914 0086 8DF80630 		strb	r3, [sp, #6]
+ 277:Cybergear/cybergear.c ****     tx_data[7]=float_to_uint(kd,KD_MIN,KD_MAX,16); 
+ 915              		.loc 1 277 5 is_stmt 1 view .LVU228
+ 916              		.loc 1 277 15 is_stmt 0 view .LVU229
+ 917 008a 8DF80700 		strb	r0, [sp, #7]
+ 278:Cybergear/cybergear.c ****     
+ 279:Cybergear/cybergear.c ****     hfdcan1TxFrame.Header.Identifier = Communication_Type_MotionControl<<24|float_to_uint(torque,T_
+ 918              		.loc 1 279 5 is_stmt 1 view .LVU230
+ 919              		.loc 1 279 77 is_stmt 0 view .LVU231
+ 920 008e 1020     		movs	r0, #16
+ 921 0090 B2EE081A 		vmov.f32	s2, #1.2e+1
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 22
+
+
+ 922 0094 FAEE080A 		vmov.f32	s1, #-1.2e+1
+ 923 0098 B0EE480A 		vmov.f32	s0, s16
+ 924 009c FFF7FEFF 		bl	float_to_uint
+ 925              	.LVL70:
+ 926              		.loc 1 279 113 view .LVU232
+ 927 00a0 0302     		lsls	r3, r0, #8
+ 928              		.loc 1 279 76 view .LVU233
+ 929 00a2 43F08073 		orr	r3, r3, #16777216
+ 930              		.loc 1 279 122 view .LVU234
+ 931 00a6 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 932              		.loc 1 279 116 view .LVU235
+ 933 00a8 1843     		orrs	r0, r0, r3
+ 934              		.loc 1 279 38 view .LVU236
+ 935 00aa 0749     		ldr	r1, .L50+8
+ 936 00ac 41F8040F 		str	r0, [r1, #4]!
+ 280:Cybergear/cybergear.c ****     HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,&hfdcan1TxFrame.Header,tx_data);
+ 937              		.loc 1 280 5 is_stmt 1 view .LVU237
+ 938 00b0 6A46     		mov	r2, sp
+ 939 00b2 0648     		ldr	r0, .L50+12
+ 940 00b4 FFF7FEFF 		bl	HAL_FDCAN_AddMessageToTxFifoQ
+ 941              	.LVL71:
+ 281:Cybergear/cybergear.c **** }
+ 942              		.loc 1 281 1 is_stmt 0 view .LVU238
+ 943 00b8 02B0     		add	sp, sp, #8
+ 944              		.cfi_def_cfa_offset 24
+ 945              		@ sp needed
+ 946 00ba BDEC048B 		vldm	sp!, {d8-d9}
+ 947              		.cfi_restore 82
+ 948              		.cfi_restore 83
+ 949              		.cfi_restore 80
+ 950              		.cfi_restore 81
+ 951              		.cfi_def_cfa_offset 8
+ 952              	.LVL72:
+ 953              		.loc 1 281 1 view .LVU239
+ 954 00be 10BD     		pop	{r4, pc}
+ 955              	.LVL73:
+ 956              	.L51:
+ 957              		.loc 1 281 1 view .LVU240
+ 958              		.align	2
+ 959              	.L50:
+ 960 00c0 00000000 		.word	0
+ 961 00c4 0000FA43 		.word	1140457472
+ 962 00c8 00000000 		.word	hfdcan1TxFrame
+ 963 00cc 00000000 		.word	hfdcan1
+ 964              		.cfi_endproc
+ 965              	.LFE345:
+ 967              		.global	mi_motor
+ 968              		.global	byte
+ 969              		.global	Motor_Can_ID
+ 970              		.global	rx_data
+ 971              		.global	rxMsg
+ 972              		.global	txmsg
+ 973              		.section	.bss.Motor_Can_ID,"aw",%nobits
+ 974              		.align	2
+ 977              	Motor_Can_ID:
+ 978 0000 00000000 		.space	4
+ 979              		.section	.bss.byte,"aw",%nobits
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 23
+
+
+ 980              		.align	2
+ 981              		.set	.LANCHOR0,. + 0
+ 984              	byte:
+ 985 0000 00000000 		.space	4
+ 986              		.section	.bss.mi_motor,"aw",%nobits
+ 987              		.align	2
+ 990              	mi_motor:
+ 991 0000 00000000 		.space	128
+ 991      00000000 
+ 991      00000000 
+ 991      00000000 
+ 991      00000000 
+ 992              		.section	.bss.rxMsg,"aw",%nobits
+ 993              		.align	2
+ 996              	rxMsg:
+ 997 0000 00000000 		.space	40
+ 997      00000000 
+ 997      00000000 
+ 997      00000000 
+ 997      00000000 
+ 998              		.section	.bss.rx_data,"aw",%nobits
+ 999              		.align	2
+ 1002              	rx_data:
+ 1003 0000 00000000 		.space	8
+ 1003      00000000 
+ 1004              		.section	.bss.txmsg,"aw",%nobits
+ 1005              		.align	2
+ 1008              	txmsg:
+ 1009 0000 00000000 		.space	36
+ 1009      00000000 
+ 1009      00000000 
+ 1009      00000000 
+ 1009      00000000 
+ 1010              		.text
+ 1011              	.Letext0:
+ 1012              		.file 2 "c:\\users\\mk\\gccarm\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\machine\\_
+ 1013              		.file 3 "c:\\users\\mk\\gccarm\\gcc-arm-none-eabi-10.3-2021.10\\arm-none-eabi\\include\\sys\\_stdi
+ 1014              		.file 4 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g431xx.h"
+ 1015              		.file 5 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g4xx.h"
+ 1016              		.file 6 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h"
+ 1017              		.file 7 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_fdcan.h"
+ 1018              		.file 8 "Core/Inc/fdcan.h"
+ 1019              		.file 9 "Cybergear/cybergear.h"
+ 1020              		.file 10 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h"
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 cybergear.c
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:20     .text.Float_to_Byte:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:25     .text.Float_to_Byte:00000000 Float_to_Byte
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:72     .text.Float_to_Byte:0000001c $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:77     .text.float_to_uint:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:82     .text.float_to_uint:00000000 float_to_uint
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:141    .text.Set_Motor_Parameter:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:146    .text.Set_Motor_Parameter:00000000 Set_Motor_Parameter
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:268    .text.Set_Motor_Parameter:00000080 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:276    .text.chack_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:282    .text.chack_cybergear:00000000 chack_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:320    .text.chack_cybergear:00000024 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:326    .text.start_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:332    .text.start_cybergear:00000000 start_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:374    .text.start_cybergear:00000028 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:380    .text.stop_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:386    .text.stop_cybergear:00000000 stop_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:433    .text.stop_cybergear:0000002c $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:439    .text.set_mode_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:445    .text.set_mode_cybergear:00000000 set_mode_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:491    .text.set_position_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:497    .text.set_position_cybergear:00000000 set_position_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:563    .text.set_speed_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:569    .text.set_speed_cybergear:00000000 set_speed_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:592    .text.set_current_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:598    .text.set_current_cybergear:00000000 set_current_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:621    .text.set_zeropos_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:627    .text.set_zeropos_cybergear:00000000 set_zeropos_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:669    .text.set_zeropos_cybergear:00000028 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:675    .text.set_CANID_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:681    .text.set_CANID_cybergear:00000000 set_CANID_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:732    .text.set_CANID_cybergear:00000030 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:738    .text.init_cybergear:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:744    .text.init_cybergear:00000000 init_cybergear
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:810    .text.init_cybergear:00000030 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:815    .text.motor_controlmode:00000000 $t
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:821    .text.motor_controlmode:00000000 motor_controlmode
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:960    .text.motor_controlmode:000000c0 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:990    .bss.mi_motor:00000000 mi_motor
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:984    .bss.byte:00000000 byte
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:977    .bss.Motor_Can_ID:00000000 Motor_Can_ID
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:1002   .bss.rx_data:00000000 rx_data
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:996    .bss.rxMsg:00000000 rxMsg
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:1008   .bss.txmsg:00000000 txmsg
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:974    .bss.Motor_Can_ID:00000000 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:980    .bss.byte:00000000 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:987    .bss.mi_motor:00000000 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:993    .bss.rxMsg:00000000 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:999    .bss.rx_data:00000000 $d
+C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s:1005   .bss.txmsg:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_FDCAN_AddMessageToTxFifoQ
+HAL_Delay
+hfdcan1TxFrame
+hfdcan1
+ARM GAS  C:\Users\MK\AppData\Local\Temp\ccVsEzE0.s 			page 25
+
+
